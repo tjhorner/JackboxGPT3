@@ -14,6 +14,8 @@ Support is planned for these games:
 
 ## Playing
 
+You'll need to provide your OpenAI API key in the environment variable `OPENAI_KEY`.
+
 To play a game, provide the room code for a supported game as the first parameter on the command line.
 
 ## Adding Games
