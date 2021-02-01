@@ -7,6 +7,11 @@ This project is a Jackbox client controlled by GPT-3. It currently supports thes
 - Fibbage 3
 - ~~Quiplash 3~~ Soon™️
 
+Support is planned for these games:
+
+- Survive The Internet
+- Word Spud
+
 ## Playing
 
 To play a game, provide the room code for a supported game as the first parameter on the command line.
