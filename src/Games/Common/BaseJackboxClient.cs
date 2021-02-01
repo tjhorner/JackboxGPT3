@@ -2,8 +2,8 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
-using JackboxGPT3.Clients.Models;
 using JackboxGPT3.Extensions;
+using JackboxGPT3.Games.Common.Models;
 using JackboxGPT3.Services;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,13 +11,13 @@ using Serilog;
 using Websocket.Client;
 using Websocket.Client.Models;
 
-namespace JackboxGPT3.Clients
+namespace JackboxGPT3.Games.Common
 {
-    public abstract class BaseJackboxClient<RoomType, PlayerType>
+    public abstract class BaseJackboxClient<TRoom, TPlayer>
     {
         private const string OP_CLIENT_WELCOME = "client/welcome";
 
-        public event EventHandler PlayerStateChanged;
+        public event EventHandler<ClientWelcome> PlayerStateChanged;
 
         /// <summary>
         /// Handle a raw <see cref="ServerMessage{Body}"/> event from ecast.
@@ -26,19 +26,20 @@ namespace JackboxGPT3.Clients
         /// </summary>
         protected event EventHandler<ServerMessage<JRaw>> MessageReceived;
 
-        protected readonly IConfigurationProvider _configuration;
-        protected readonly ILogger _logger;
+        private readonly IConfigurationProvider _configuration;
+        private readonly ILogger _logger;
 
-        protected Guid _playerId = Guid.NewGuid();
-        protected GameState<RoomType, PlayerType> _gameState;
+        protected Guid PlayerId = Guid.NewGuid();
+        // ReSharper disable once InconsistentNaming
+        protected GameState<TRoom, TPlayer> _gameState;
 
         private WebsocketClient _webSocket;
         private ManualResetEvent _exitEvent;
-        private int _msgSeq = 0;
+        private int _msgSeq;
 
-        public GameState<RoomType, PlayerType> GameState => _gameState;
+        public GameState<TRoom, TPlayer> GameState => _gameState;
 
-        public BaseJackboxClient(IConfigurationProvider configuration, ILogger logger)
+        protected BaseJackboxClient(IConfigurationProvider configuration, ILogger logger)
         {
             _configuration = configuration;
             _logger = logger;
@@ -50,7 +51,7 @@ namespace JackboxGPT3.Clients
             {
                 Role = "player",
                 Name = _configuration.PlayerName,
-                UserId = _playerId.ToString(),
+                UserId = PlayerId.ToString(),
                 Format = "json",
                 Password = ""
             };
@@ -87,6 +88,7 @@ namespace JackboxGPT3.Clients
             {
                 var cw = JsonConvert.DeserializeObject<ClientWelcome>(srvMsg.Result.ToString());
                 HandleClientWelcome(cw);
+                PlayerStateChanged?.Invoke(this, cw);
             }
 
             MessageReceived?.Invoke(this, srvMsg);

@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace JackboxGPT3.Clients.Models
+namespace JackboxGPT3.Games.Common.Models
 {
-    public struct ServerMessage<BodyType>
+    public struct ServerMessage<TBody>
     {
         [JsonProperty("pc")]
         public int Seq { get; set; }
@@ -11,6 +11,6 @@ namespace JackboxGPT3.Clients.Models
         public string OpCode { get; set; }
 
         [JsonProperty("result")]
-        public BodyType Result { get; set; }
+        public TBody Result { get; set; }
     }
 }

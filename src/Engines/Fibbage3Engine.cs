@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using JackboxGPT3.Clients;
-using JackboxGPT3.Clients.Models.Fibbage3;
 using JackboxGPT3.Extensions;
+using JackboxGPT3.Games.Fibbage3;
+using JackboxGPT3.Games.Fibbage3.Models;
 using JackboxGPT3.Services;
 using Serilog;
 using static JackboxGPT3.Services.ICompletionService;
@@ -12,12 +12,12 @@ namespace JackboxGPT3.Engines
 {
     public class Fibbage3Engine : BaseJackboxEngine
     {
-        public override string Tag => "fibbage3";
+        protected override string Tag => "fibbage3";
 
         private readonly Fibbage3Client _client;
 
-        private bool _lieLock = false;
-        private bool _truthLock = false;
+        private bool _lieLock;
+        private bool _truthLock;
 
         public Fibbage3Engine(ICompletionService completionService, ILogger logger, Fibbage3Client client) : base(completionService, logger)
         {
@@ -46,7 +46,8 @@ namespace JackboxGPT3.Engines
         {
             LogDebug($"New room state: {room.State}");
         }
-
+        
+        #region Game Actions
         private async void SubmitLie()
         {
             _lieLock = true;
@@ -65,7 +66,7 @@ namespace JackboxGPT3.Engines
             _truthLock = true;
 
             var prompt = CleanPromptForEntry(_client.GameState.Room.Question);
-            LogInfo($"Asking GPT-3 to choose truth.");
+            LogInfo("Asking GPT-3 to choose truth.");
 
             var choices = _client.GameState.Self.LieChoices;
             var truth = await ProvideTruth(prompt, choices);
@@ -87,24 +88,26 @@ namespace JackboxGPT3.Engines
 
             _client.ChooseCategory(category);
         }
+        #endregion
 
+        #region GPT-3 Prompts
         private async Task<string> ProvideLie(string fibPrompt)
         {
             var prompt = $"Here are some prompts from the game Fibbage, in which players attempt to write convincing lies to trick others.\n\nQ: In the mid-1800s, Queen Victoria employed a man named Jack Black, whose official job title was Royal _______.\nA: Flute player\n\nQ: In 2016, KFC announced it created a _______ that smells like fried chicken.\nA: Scratch 'n' sniff menu\n\nQ: Due to a habit he had while roaming the halls of the White House, President Lyndon B. Johnson earned the nickname \"_______ Johnson.\"\nA: Desk Butt\n\nQ: {fibPrompt}\nA:";
 
-            var result = await _completionService.CompletePrompt(prompt, new CompletionParameters
+            var result = await CompletionService.CompletePrompt(prompt, new CompletionParameters
             {
                 Temperature = 0.7,
                 MaxTokens = 16,
                 TopP = 1,
                 FrequencyPenalty = 0.2,
-                StopSequences = new string[] { "\n" }
-            }, (completion) => !completion.Text.Contains("___") && completion.Text.Length <= 45);
+                StopSequences = new[] { "\n" }
+            }, completion => !completion.Text.Contains("___") && completion.Text.Length <= 45);
 
             return result.Text.Trim();
         }
 
-        private async Task<int> ProvideTruth(string fibPrompt, List<LieChoice> lies)
+        private async Task<int> ProvideTruth(string fibPrompt, IReadOnlyList<LieChoice> lies)
         {
             var options = "";
 
@@ -115,17 +118,17 @@ namespace JackboxGPT3.Engines
 
             var prompt = $"I was given a list of lies and one truth for the prompt \"${fibPrompt}\". These were my options:\n\n${options}\nI think the truth is answer number";
 
-            var result = await _completionService.CompletePrompt(prompt, new CompletionParameters
+            var result = await CompletionService.CompletePrompt(prompt, new CompletionParameters
             {
                 Temperature = 1,
                 MaxTokens = 1,
                 TopP = 1,
-                StopSequences = new string[] { "\n" }
-            }, (completion) =>
+                StopSequences = new[] { "\n" }
+            }, completion =>
             {
                 try
                 {
-                    int.Parse(completion.Text.Trim());
+                    _ = int.Parse(completion.Text.Trim());
                 } catch(FormatException)
                 {
                     return false;
@@ -136,9 +139,11 @@ namespace JackboxGPT3.Engines
 
             return int.Parse(result.Text.Trim()) - 1;
         }
+        #endregion
 
         #region Prompt Cleanup
-        internal static string CleanPromptForEntry(string prompt)
+
+        private static string CleanPromptForEntry(string prompt)
         {
             return prompt.StripHtml();
         }

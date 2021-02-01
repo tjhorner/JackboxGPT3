@@ -1,21 +1,19 @@
-﻿using System;
-using JackboxGPT3.Clients;
-using JackboxGPT3.Services;
+﻿using JackboxGPT3.Services;
 using Serilog;
 
 namespace JackboxGPT3.Engines
 {
     public abstract class BaseJackboxEngine : IJackboxEngine
     {
-        public abstract string Tag { get; }
+        protected abstract string Tag { get; }
 
-        protected readonly ICompletionService _completionService;
+        protected readonly ICompletionService CompletionService;
+        
+        private readonly ILogger _logger;
 
-        protected ILogger _logger;
-
-        public BaseJackboxEngine(ICompletionService completionService, ILogger logger)
+        protected BaseJackboxEngine(ICompletionService completionService, ILogger logger)
         {
-            _completionService = completionService;
+            CompletionService = completionService;
             _logger = logger;
         }
 

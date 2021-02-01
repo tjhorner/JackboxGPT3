@@ -1,12 +1,13 @@
 ﻿using System;
-using JackboxGPT3.Clients.Models;
-using JackboxGPT3.Clients.Models.Fibbage3;
+using JackboxGPT3.Games.Common;
+using JackboxGPT3.Games.Common.Models;
+using JackboxGPT3.Games.Fibbage3.Models;
 using JackboxGPT3.Services;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
-using Newtonsoft.Json;
 
-namespace JackboxGPT3.Clients
+namespace JackboxGPT3.Games.Fibbage3
 {
     public class Fibbage3Client : BaseJackboxClient<Fibbage3Room, Fibbage3Player>
     {
@@ -81,7 +82,7 @@ namespace JackboxGPT3.Clients
         private void HandleTextOperation(TextOperation op)
         {
             // special case: player ID
-            if (op.Key == $"{KEY_PLAYER_PREFIX}{_playerId}")
+            if (op.Key == $"{KEY_PLAYER_PREFIX}{PlayerId}")
             {
                 var self = JsonConvert.DeserializeObject<Fibbage3Player>(op.Value);
                 _gameState.Self = self;

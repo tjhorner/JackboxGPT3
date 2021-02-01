@@ -5,9 +5,9 @@ using Serilog;
 
 namespace JackboxGPT3
 {
-    class Program
+    public static class Program
     {
-        static void Main()
+        public static void Main()
         {
             DotEnv.AutoConfig();
 

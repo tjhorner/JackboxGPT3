@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace JackboxGPT3.Clients.Models
+namespace JackboxGPT3.Games.Common.Models
 {
     public struct GetRoomResponse
     {

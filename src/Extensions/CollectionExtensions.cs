@@ -5,11 +5,11 @@ namespace JackboxGPT3.Extensions
 {
     public static class CollectionExtensions
     {
-        private static readonly Random random = new Random();
+        private static readonly Random _random = new();
 
         public static int RandomIndex(this ICollection collection)
         {
-            return random.Next(0, collection.Count);
+            return _random.Next(0, collection.Count);
         }
     }
 }

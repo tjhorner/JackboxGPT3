@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
-using JackboxGPT3.Clients;
-using JackboxGPT3.Clients.Models;
 using JackboxGPT3.Engines;
+using JackboxGPT3.Games.Common.Models;
+using JackboxGPT3.Games.Fibbage3;
+using JackboxGPT3.Games.Quiplash3;
 using JackboxGPT3.Services;
 using Newtonsoft.Json;
 using Serilog;
@@ -14,9 +14,9 @@ namespace JackboxGPT3
 {
     public static class Startup
     {
-        private static readonly HttpClient _httpClient = new HttpClient();
+        private static readonly HttpClient _httpClient = new();
 
-        public async static Task Bootstrap(IContainer container)
+        public static async Task Bootstrap(IContainer container)
         {
             var logger = container.Resolve<ILogger>();
 

@@ -1,9 +1,9 @@
-﻿using System;
-using JackboxGPT3.Clients.Models.Quiplash3;
+﻿using JackboxGPT3.Games.Common;
+using JackboxGPT3.Games.Quiplash3.Models;
 using JackboxGPT3.Services;
 using Serilog;
 
-namespace JackboxGPT3.Clients
+namespace JackboxGPT3.Games.Quiplash3
 {
     public class Quiplash3Client : BaseJackboxClient<Quiplash3Room, Quiplash3Player>
     {

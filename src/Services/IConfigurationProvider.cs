@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace JackboxGPT3.Services
+﻿namespace JackboxGPT3.Services
 {
     public interface IConfigurationProvider
     {

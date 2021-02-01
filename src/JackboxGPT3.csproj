@@ -17,10 +17,6 @@
 
   <ItemGroup>
     <Folder Include="Engines\" />
-    <Folder Include="Clients\" />
-    <Folder Include="Clients\Models\" />
     <Folder Include="Extensions\" />
-    <Folder Include="Clients\Models\Fibbage3\" />
-    <Folder Include="Clients\Models\Quiplash3\" />
   </ItemGroup>
 </Project>

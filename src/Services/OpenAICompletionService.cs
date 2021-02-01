@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using OpenAI_API;
 using static JackboxGPT3.Services.ICompletionService;
 
 namespace JackboxGPT3.Services
 {
+    // ReSharper disable once InconsistentNaming
     public class OpenAICompletionService : ICompletionService
     {
         private readonly OpenAIAPI _api;
@@ -35,10 +35,10 @@ namespace JackboxGPT3.Services
                 tries++;
                 var apiResult = await _api.Completions.CreateCompletionAsync(
                     prompt,
-                    max_tokens: completionParameters.MaxTokens,
-                    temperature: completionParameters.Temperature,
-                    top_p: completionParameters.TopP,
-                    numOutputs: 1,
+                    completionParameters.MaxTokens,
+                    completionParameters.Temperature,
+                    completionParameters.TopP,
+                    1,
                     logProbs: completionParameters.LogProbs,
                     echo: completionParameters.Echo,
                     presencePenalty: completionParameters.PresencePenalty,
@@ -57,7 +57,7 @@ namespace JackboxGPT3.Services
 
         private static CompletionResponse ChoiceToCompletionResponse(Choice choice)
         {
-            return new CompletionResponse
+            return new()
             {
                 Text = choice.Text,
                 FinishReason = choice.FinishReason

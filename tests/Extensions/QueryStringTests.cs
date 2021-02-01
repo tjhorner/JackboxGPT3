@@ -2,12 +2,13 @@
 using JackboxGPT3.Extensions;
 using Newtonsoft.Json;
 using NUnit.Framework;
+// ReSharper disable NotAccessedField.Local
 
 namespace Tests.Extensions
 {
     public class QueryStringTests
     {
-        struct TestStruct
+        private struct TestStruct
         {
             public string SomeString;
             public bool SomeBool;
@@ -28,7 +29,7 @@ namespace Tests.Extensions
             result.Should().Be("SomeString=hello&SomeBool=true&SomeInt=69");
         }
 
-        struct CustomTestStruct
+        private struct CustomTestStruct
         {
             [JsonProperty("custom_property")]
             public string CustomProperty;
