@@ -100,7 +100,19 @@ namespace JackboxGPT3.Engines
         #region GPT-3 Prompts
         private async Task<string> ProvideLie(string fibPrompt)
         {
-            var prompt = $"Here are some prompts from the game Fibbage, in which players attempt to write convincing lies to trick others.\n\nQ: In the mid-1800s, Queen Victoria employed a man named Jack Black, whose official job title was Royal _______.\nA: Flute player\n\nQ: In 2016, KFC announced it created a _______ that smells like fried chicken.\nA: Scratch 'n' sniff menu\n\nQ: Due to a habit he had while roaming the halls of the White House, President Lyndon B. Johnson earned the nickname \"_______ Johnson.\"\nA: Desk Butt\n\nQ: {fibPrompt}\nA:";
+            var prompt = $@"Here are some prompts from the game Fibbage, in which players attempt to write convincing lies to trick others.
+
+Q: In the mid-1800s, Queen Victoria employed a man named Jack Black, whose official job title was Royal _______.
+A: Flute player
+
+Q: In 2016, KFC announced it created a _______ that smells like fried chicken.
+A: Scratch 'n' sniff menu
+
+Q: Due to a habit he had while roaming the halls of the White House, President Lyndon B. Johnson earned the nickname ""_______ Johnson.""
+A: Desk Butt
+
+Q: {fibPrompt}
+A:";
 
             var result = await CompletionService.CompletePrompt(prompt, new CompletionParameters
             {
@@ -121,7 +133,10 @@ namespace JackboxGPT3.Engines
             for(var i = 0; i < lies.Count; i++)
                 options += $"{i + 1}. {lies[i].Text}\n";
 
-            var prompt = $"I was given a list of lies and one truth for the prompt \"${fibPrompt}\". These were my options:\n\n${options}\nI think the truth is answer number";
+            var prompt = $@"I was given a list of lies and one truth for the prompt ""${fibPrompt}"". These were my options:
+
+${options}
+I think the truth is answer number";
 
             var result = await CompletionService.CompletePrompt(prompt, new CompletionParameters
             {
