@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.808.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JackboxGPT3", "src\JackboxGPT3.csproj", "{0E155835-CDCC-4DAA-80F9-CBCDE6A6B64E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\tests.csproj", "{08C74394-8BAF-4DB2-A9ED-82C664D06E43}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E155835-CDCC-4DAA-80F9-CBCDE6A6B64E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E155835-CDCC-4DAA-80F9-CBCDE6A6B64E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E155835-CDCC-4DAA-80F9-CBCDE6A6B64E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E155835-CDCC-4DAA-80F9-CBCDE6A6B64E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08C74394-8BAF-4DB2-A9ED-82C664D06E43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08C74394-8BAF-4DB2-A9ED-82C664D06E43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08C74394-8BAF-4DB2-A9ED-82C664D06E43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08C74394-8BAF-4DB2-A9ED-82C664D06E43}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ECB2369F-4ADD-46AE-B204-CECBAF5054A1}
+	EndGlobalSection
+EndGlobal

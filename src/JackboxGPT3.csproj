@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="6.1.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="OpenAI" Version="1.2.0" />
+    <PackageReference Include="dotenv.net" Version="2.1.3" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="Websocket.Client" Version="4.3.21" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Engines\" />
+    <Folder Include="Clients\" />
+    <Folder Include="Clients\Models\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Clients\Models\Fibbage3\" />
+    <Folder Include="Clients\Models\Quiplash3\" />
+  </ItemGroup>
+</Project>
