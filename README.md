@@ -37,7 +37,7 @@ You will need to do some reverse engineering work to understand the protocol eac
 
 What you do here really depends on the game you are adding, but generally you will need to add handlers for room and player updates by overriding `ServerMessageReceived` and handling the relevant opcodes. For example, Fibbage 3 uses the opcode `text` to send objects which have a `key` and a `val` -- for room updates, the `key` is `bc:room`. When this is received, the `GameState` is updated with the room details. You can see how this is handled inside of the `ServerMessageReceived` in `Fibbage3Client`.
 
-The methods and events you create should reflect actions a player would take in a game. For example, the Fibbage 3 client has a method `SubmitLie` which will, you know, submit a lie that answers the prompt. You may also wish to create events in your client for room updates and player updates.
+The API you create should reflect actions a player would take in a game. For example, the Fibbage 3 client has a method `SubmitLie` which will, you know, submit a lie that answers the prompt. You may also wish to create events in your client for room updates and player updates.
 
 ### Engine
 
