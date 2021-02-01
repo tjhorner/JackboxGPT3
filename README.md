@@ -33,7 +33,7 @@ Ok, but what do all of these things even do?
 
 The game client handles abstracts the communication between the Jackbox server into a nice API that can be consumed by the engine.
 
-You will need to do some reverse engineering work to understand the protocol each game uses to communicate. However, all Jackbox games share at least some similarities: the raw WebSocket data is sent in a consistent JSON structure, including a seq, opcode, and some body. The `BaseJackboxClient` will deserialize this for you and send it to your `ServerMessageReceived` method for further processing.
+You will need to do some reverse engineering work to understand the protocol each game uses to communicate. However, all Jackbox games share at least some similarities: the raw WebSocket data is sent in a consistent JSON structure, including a sequence identifier, opcode, and some body. The `BaseJackboxClient` will deserialize this for you and send it to your `ServerMessageReceived` method for further processing.
 
 What you do here really depends on the game you are adding, but generally you will need to add handlers for room and player updates by overriding `ServerMessageReceived` and handling the relevant opcodes. For example, Fibbage 3 uses the opcode `text` to send objects which have a `key` and a `val` -- for room updates, the `key` is `bc:room`. When this is received, the `GameState` is updated with the room details. You can see how this is handled inside of the `ServerMessageReceived` in `Fibbage3Client`.
 
