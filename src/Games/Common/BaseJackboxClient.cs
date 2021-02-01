@@ -13,7 +13,7 @@ using Websocket.Client.Models;
 
 namespace JackboxGPT3.Games.Common
 {
-    public abstract class BaseJackboxClient<TRoom, TPlayer>
+    public abstract class BaseJackboxClient<TRoom, TPlayer> : IJackboxClient
     {
         private const string OP_CLIENT_WELCOME = "client/welcome";
 
@@ -24,7 +24,7 @@ namespace JackboxGPT3.Games.Common
         /// You'll need to deserialize the <see cref="ServerMessage{Body}.Result"/> yourself
         /// depending on the opcode.
         /// </summary>
-        protected event EventHandler<ServerMessage<JRaw>> MessageReceived;
+        protected abstract void ServerMessageReceived(ServerMessage<JRaw> message);
 
         private readonly IConfigurationProvider _configuration;
         private readonly ILogger _logger;
@@ -91,7 +91,7 @@ namespace JackboxGPT3.Games.Common
                 PlayerStateChanged?.Invoke(this, cw);
             }
 
-            MessageReceived?.Invoke(this, srvMsg);
+            ServerMessageReceived(srvMsg);
         }
 
         private void WsConnected(ReconnectionInfo inf)

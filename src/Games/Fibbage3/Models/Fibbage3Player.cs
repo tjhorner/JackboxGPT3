@@ -6,6 +6,7 @@ namespace JackboxGPT3.Games.Fibbage3.Models
 {
     public struct Fibbage3Player
     {
+        // ReSharper disable once UnusedMember.Global
         public List<string> CategoryChoices
         {
             get

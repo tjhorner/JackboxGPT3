@@ -16,13 +16,11 @@ namespace JackboxGPT3.Games.Fibbage3
 
         private const string KEY_ROOM = "bc:room";
         private const string KEY_PLAYER_PREFIX = "bc:customer:";
-
+        
         public event EventHandler<Fibbage3Room> OnRoomUpdate;
         public event EventHandler<Fibbage3Player> OnSelfUpdate;
 
-        public Fibbage3Client(IConfigurationProvider configuration, ILogger logger) : base(configuration, logger) {
-            MessageReceived += ServerMessageReceived;
-        }
+        public Fibbage3Client(IConfigurationProvider configuration, ILogger logger) : base(configuration, logger) { }
 
         public void ChooseCategory(int index)
         {
@@ -68,7 +66,7 @@ namespace JackboxGPT3.Games.Fibbage3
             WsSend(OP_CLIENT_SEND, operation);
         }
 
-        private void ServerMessageReceived(object sender, ServerMessage<JRaw> msg)
+        protected override void ServerMessageReceived(ServerMessage<JRaw> msg)
         {
             switch(msg.OpCode)
             {

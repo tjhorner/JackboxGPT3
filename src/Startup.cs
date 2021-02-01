@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
@@ -63,8 +64,8 @@ namespace JackboxGPT3
             builder.RegisterType<Fibbage3Client>();
             builder.RegisterType<Fibbage3Engine>().Keyed<IJackboxEngine>("fibbage3");
 
-            builder.RegisterType<Quiplash3Client>();
-            builder.RegisterType<Quiplash3Engine>().Keyed<IJackboxEngine>("quiplash3");
+            // builder.RegisterType<Quiplash3Client>();
+            // builder.RegisterType<Quiplash3Engine>().Keyed<IJackboxEngine>("quiplash3");
         }
     }
 }

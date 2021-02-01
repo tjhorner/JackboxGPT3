@@ -10,35 +10,33 @@ using static JackboxGPT3.Services.ICompletionService;
 
 namespace JackboxGPT3.Engines
 {
-    public class Fibbage3Engine : BaseJackboxEngine
+    public class Fibbage3Engine : BaseJackboxEngine<Fibbage3Client>
     {
         protected override string Tag => "fibbage3";
-
-        private readonly Fibbage3Client _client;
 
         private bool _lieLock;
         private bool _truthLock;
 
-        public Fibbage3Engine(ICompletionService completionService, ILogger logger, Fibbage3Client client) : base(completionService, logger)
+        public Fibbage3Engine(ICompletionService completionService, ILogger logger, Fibbage3Client client)
+            : base(completionService, logger, client)
         {
-            _client = client;
-            _client.OnRoomUpdate += OnRoomUpdate;
-            _client.OnSelfUpdate += OnSelfUpdate;
-            _client.Connect();
+            JackboxClient.OnRoomUpdate += OnRoomUpdate;
+            JackboxClient.OnSelfUpdate += OnSelfUpdate;
+            JackboxClient.Connect();
         }
 
         private void OnSelfUpdate(object sender, Fibbage3Player self)
         {
-            if (_client.GameState.Room.State == RoomState.EndShortie || self.Error != null)
+            if (JackboxClient.GameState.Room.State == RoomState.EndShortie || self.Error != null)
                 _lieLock = _truthLock = false;
 
-            if (_client.GameState.Room.State == RoomState.CategorySelection && self.IsChoosing)
+            if (JackboxClient.GameState.Room.State == RoomState.CategorySelection && self.IsChoosing)
                 ChooseRandomCategory();
 
-            if (_client.GameState.Room.State == RoomState.EnterText && !_lieLock)
+            if (JackboxClient.GameState.Room.State == RoomState.EnterText && !_lieLock)
                 SubmitLie();
 
-            if (_client.GameState.Room.State == RoomState.ChooseLie && !_truthLock)
+            if (JackboxClient.GameState.Room.State == RoomState.ChooseLie && !_truthLock)
                 SubmitTruth();
         }
 
@@ -52,32 +50,32 @@ namespace JackboxGPT3.Engines
         {
             _lieLock = true;
 
-            var prompt = CleanPromptForEntry(_client.GameState.Self.Question);
+            var prompt = CleanPromptForEntry(JackboxClient.GameState.Self.Question);
             LogInfo($"Asking GPT-3 for lie in response to \"{prompt}\".");
 
             var lie = await ProvideLie(prompt);
             LogInfo($"Submitting lie \"{lie}\".");
 
-            _client.SubmitLie(lie);
+            JackboxClient.SubmitLie(lie);
         }
 
         private async void SubmitTruth()
         {
             _truthLock = true;
 
-            var prompt = CleanPromptForEntry(_client.GameState.Room.Question);
+            var prompt = CleanPromptForEntry(JackboxClient.GameState.Room.Question);
             LogInfo("Asking GPT-3 to choose truth.");
 
-            var choices = _client.GameState.Self.LieChoices;
+            var choices = JackboxClient.GameState.Self.LieChoices;
             var truth = await ProvideTruth(prompt, choices);
             LogInfo($"Submitting truth {truth}.");
 
-            _client.SubmitTruth(truth, choices[truth].Text);
+            JackboxClient.SubmitTruth(truth, choices[truth].Text);
         }
 
         private async void ChooseRandomCategory()
         {
-            var room = _client.GameState.Room;
+            var room = JackboxClient.GameState.Room;
 
             LogInfo("Time to choose a category.");
             await Task.Delay(3000);
@@ -86,7 +84,7 @@ namespace JackboxGPT3.Engines
             var category = choices.RandomIndex();
             LogInfo($"Choosing category \"{choices[category].Trim()}\".");
 
-            _client.ChooseCategory(category);
+            JackboxClient.ChooseCategory(category);
         }
         #endregion
 

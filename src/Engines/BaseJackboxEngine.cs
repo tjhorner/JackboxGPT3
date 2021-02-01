@@ -1,22 +1,27 @@
-﻿using JackboxGPT3.Services;
+﻿using JackboxGPT3.Games.Common;
+using JackboxGPT3.Services;
 using Serilog;
 
 namespace JackboxGPT3.Engines
 {
-    public abstract class BaseJackboxEngine : IJackboxEngine
+    public abstract class BaseJackboxEngine<TClient> : IJackboxEngine
+        where TClient : IJackboxClient
     {
         protected abstract string Tag { get; }
 
         protected readonly ICompletionService CompletionService;
+        protected readonly TClient JackboxClient;
         
         private readonly ILogger _logger;
 
-        protected BaseJackboxEngine(ICompletionService completionService, ILogger logger)
+        protected BaseJackboxEngine(ICompletionService completionService, ILogger logger, TClient client)
         {
             CompletionService = completionService;
+            JackboxClient = client;
             _logger = logger;
         }
 
+        // ReSharper disable UnusedMember.Global
         protected void LogWarning(string text)
         {
             _logger.Warning($"[{Tag}] {text}");
@@ -41,5 +46,6 @@ namespace JackboxGPT3.Engines
         {
             _logger.Information($"[{Tag}] {text}");
         }
+        // ReSharper restore UnusedMember.Global
     }
 }

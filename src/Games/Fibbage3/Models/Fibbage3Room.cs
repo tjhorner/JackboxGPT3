@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 
 namespace JackboxGPT3.Games.Fibbage3.Models
 {
+    // ReSharper disable UnusedMember.Global
     public enum LobbyState
     {
         WaitingForMore,
@@ -23,6 +24,7 @@ namespace JackboxGPT3.Games.Fibbage3.Models
         ChooseLike,
         EndGame
     }
+    // ReSharper restore UnusedMember.Global
 
     public struct Fibbage3Room
     {
@@ -38,6 +40,7 @@ namespace JackboxGPT3.Games.Fibbage3.Models
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public List<LieChoice> LieChoices
         {
             get
