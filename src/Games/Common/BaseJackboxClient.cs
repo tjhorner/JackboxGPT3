@@ -16,6 +16,7 @@ namespace JackboxGPT3.Games.Common
     public abstract class BaseJackboxClient<TRoom, TPlayer> : IJackboxClient
     {
         private const string OP_CLIENT_WELCOME = "client/welcome";
+        private const string OP_CLIENT_SEND = "client/send";
 
         public event EventHandler<ClientWelcome> PlayerStateChanged;
 
@@ -124,6 +125,18 @@ namespace JackboxGPT3.Games.Common
 
             var msg = JsonConvert.SerializeObject(clientMessage);
             _webSocket.Send(msg);
+        }
+        
+        protected void ClientSend<T>(T req)
+        {
+            var cs = new ClientSendOperation<T>
+            {
+                From = _gameState.PlayerId,
+                To = 1,
+                Body = req
+            };
+
+            WsSend(OP_CLIENT_SEND, cs);
         }
     }
 }

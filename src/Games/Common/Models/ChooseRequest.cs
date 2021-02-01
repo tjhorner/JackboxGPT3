@@ -1,11 +1,16 @@
 ﻿using Newtonsoft.Json;
 
-namespace JackboxGPT3.Games.Fibbage3.Models
+namespace JackboxGPT3.Games.Common.Models
 {
     public struct ChooseRequest<TChoice>
     {
+        public ChooseRequest(TChoice choice)
+        {
+            Choice = choice;
+        }
+        
         [JsonProperty("action")]
-        public string Action => "choose";
+        public static string Action => "choose";
 
         [JsonProperty("choice")]
         public TChoice Choice { get; set; }

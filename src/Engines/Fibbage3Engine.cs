@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JackboxGPT3.Extensions;
+using JackboxGPT3.Games.Common.Models;
 using JackboxGPT3.Games.Fibbage3;
 using JackboxGPT3.Games.Fibbage3.Models;
 using JackboxGPT3.Services;
@@ -25,10 +26,17 @@ namespace JackboxGPT3.Engines
             JackboxClient.Connect();
         }
 
-        private void OnSelfUpdate(object sender, Fibbage3Player self)
+        private void OnSelfUpdate(object sender, Revision<Fibbage3Player> revision)
         {
+            var self = revision.New;
+            
             if (JackboxClient.GameState.Room.State == RoomState.EndShortie || self.Error != null)
+            {
+                if(self.Error != null)
+                    LogWarning($"Received submission error from game: {self.Error}");
+                
                 _lieLock = _truthLock = false;
+            }
 
             if (JackboxClient.GameState.Room.State == RoomState.CategorySelection && self.IsChoosing)
                 ChooseRandomCategory();
@@ -40,8 +48,9 @@ namespace JackboxGPT3.Engines
                 SubmitTruth();
         }
 
-        private void OnRoomUpdate(object sender, Fibbage3Room room)
+        private void OnRoomUpdate(object sender, Revision<Fibbage3Room> revision)
         {
+            var room = revision.New;
             LogDebug($"New room state: {room.State}");
         }
         
@@ -70,7 +79,7 @@ namespace JackboxGPT3.Engines
             var truth = await ProvideTruth(prompt, choices);
             LogInfo($"Submitting truth {truth}.");
 
-            JackboxClient.SubmitTruth(truth, choices[truth].Text);
+            JackboxClient.ChooseTruth(truth, choices[truth].Text);
         }
 
         private async void ChooseRandomCategory()
@@ -95,7 +104,7 @@ namespace JackboxGPT3.Engines
 
             var result = await CompletionService.CompletePrompt(prompt, new CompletionParameters
             {
-                Temperature = 0.7,
+                Temperature = 0.8,
                 MaxTokens = 16,
                 TopP = 1,
                 FrequencyPenalty = 0.2,
@@ -110,9 +119,7 @@ namespace JackboxGPT3.Engines
             var options = "";
 
             for(var i = 0; i < lies.Count; i++)
-            {
                 options += $"{i + 1}. {lies[i].Text}\n";
-            }
 
             var prompt = $"I was given a list of lies and one truth for the prompt \"${fibPrompt}\". These were my options:\n\n${options}\nI think the truth is answer number";
 
@@ -126,13 +133,12 @@ namespace JackboxGPT3.Engines
             {
                 try
                 {
-                    _ = int.Parse(completion.Text.Trim());
+                    var answer = int.Parse(completion.Text.Trim());
+                    return answer <= lies.Count && answer > 0;
                 } catch(FormatException)
                 {
                     return false;
                 }
-
-                return completion.Text.Split("|").Length <= lies.Count;
             });
 
             return int.Parse(result.Text.Trim()) - 1;
@@ -140,7 +146,6 @@ namespace JackboxGPT3.Engines
         #endregion
 
         #region Prompt Cleanup
-
         private static string CleanPromptForEntry(string prompt)
         {
             return prompt.StripHtml();

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace JackboxGPT3.Games.Fibbage3.Models
+namespace JackboxGPT3.Games.Common.Models
 {
     public struct ClientSendOperation<TBody>
     {

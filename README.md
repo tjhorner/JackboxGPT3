@@ -5,7 +5,7 @@ Because I wanted to use AI for party games instead of useful things.
 This project is a Jackbox client controlled by GPT-3. It currently supports these games:
 
 - Fibbage 3
-- ~~Quiplash 3~~ Being ported from the old version right now, so not yet
+- Quiplash 3
 
 Support is planned for these games:
 

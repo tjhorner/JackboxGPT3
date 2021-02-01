@@ -12,6 +12,7 @@ namespace JackboxGPT3
             DotEnv.AutoConfig();
 
             var logger = new LoggerConfiguration()
+                .MinimumLevel.Verbose()
                 .WriteTo.Console()
                 .CreateLogger();
 
