@@ -38,7 +38,8 @@ namespace JackboxGPT3.Services
             string prompt,
             CompletionParameters completionParameters,
             Func<CompletionResponse, bool> conditions,
-            int maxTries = 5
+            int maxTries = 5,
+            string defaultResponse = ""
         );
     }
 }

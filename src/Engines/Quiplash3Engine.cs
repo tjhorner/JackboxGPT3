@@ -18,6 +18,7 @@ namespace JackboxGPT3.Engines
         protected override string Tag => "quiplash3";
 
         private bool _selectedAvatar;
+        private Random _random = new();
 
         public Quiplash3Engine(ICompletionService completionService, ILogger logger, Quiplash3Client client)
             : base(completionService, logger, client)
@@ -129,7 +130,8 @@ Funny Answer:";
                 FrequencyPenalty = 0.2,
                 PresencePenalty = 0.1,
                 StopSequences = new[] { "\n" }
-            }, completion => !completion.Text.Contains("___") && completion.Text.Length <= 45);
+            }, completion => !completion.Text.Contains("___") && completion.Text.Length <= 45,
+                defaultResponse: "⁇");
 
             return result.Text.Trim().TrimEnd('.');
         }
@@ -174,7 +176,8 @@ Funny Answer:";
                 FrequencyPenalty = 0.2,
                 PresencePenalty = 0.1,
                 StopSequences = new[] { "\n" }
-            }, completion => completion.Text.Split("|").Length == 3 && !completion.Text.Contains("___") && completion.Text.Length <= 45);
+            }, completion => completion.Text.Split("|").Length == 3 && !completion.Text.Contains("___") && completion.Text.Length <= 45,
+                defaultResponse: "Oops|GPT-3 didn't work|Sigh");
 
             return string.Join("\n", result.Text.Split("|")).Trim();
         }
@@ -200,11 +203,12 @@ Funny Answer:";
                 {
                     var answer = int.Parse(completion.Text.Trim());
                     return answer <= quips.Count && answer > 0;
-                } catch(FormatException)
+                }
+                catch(FormatException)
                 {
                     return false;
                 }
-            });
+            }, defaultResponse: _random.Next(0, quips.Count).ToString());
 
             return int.Parse(result.Text.Trim()) - 1;
         }

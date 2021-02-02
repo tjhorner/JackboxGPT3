@@ -24,7 +24,8 @@ namespace JackboxGPT3.Services
             string prompt,
             CompletionParameters completionParameters,
             Func<CompletionResponse, bool> conditions = null,
-            int maxTries = 5
+            int maxTries = 5,
+            string defaultResponse = ""
         ) {
             var result = new CompletionResponse();
             var validResponse = false;
@@ -51,6 +52,13 @@ namespace JackboxGPT3.Services
                 if (conditions == null) break;
                 validResponse = conditions(result);
             }
+
+            if (!validResponse)
+                result = new CompletionResponse
+                {
+                    FinishReason = "no_valid_responses",
+                    Text = defaultResponse
+                };
 
             return result;
         }

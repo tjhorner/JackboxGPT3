@@ -121,7 +121,8 @@ A:";
                 TopP = 1,
                 FrequencyPenalty = 0.2,
                 StopSequences = new[] { "\n" }
-            }, completion => !completion.Text.Contains("___") && completion.Text.Length <= 45);
+            }, completion => !completion.Text.Contains("___") && completion.Text.Length <= 45,
+                defaultResponse: "Default Response!");
 
             return result.Text.Trim();
         }
@@ -150,11 +151,12 @@ I think the truth is answer number";
                 {
                     var answer = int.Parse(completion.Text.Trim());
                     return answer <= lies.Count && answer > 0;
-                } catch(FormatException)
+                }
+                catch(FormatException)
                 {
                     return false;
                 }
-            });
+            }, defaultResponse: "0");
 
             return int.Parse(result.Text.Trim()) - 1;
         }

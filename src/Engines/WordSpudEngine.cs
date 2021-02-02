@@ -74,7 +74,8 @@ mmmmmr. peanut
                 FrequencyPenalty = 0.3,
                 PresencePenalty = 0.2,
                 StopSequences = new[] { "\n" }
-            }, completion => completion.Text.Trim() != "" && completion.Text.Length <= 32);
+            }, completion => completion.Text.Trim() != "" && completion.Text.Length <= 32,
+                defaultResponse: "oops, it broke");
 
             return result.Text.TrimEnd();
         }
