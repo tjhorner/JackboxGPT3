@@ -15,7 +15,7 @@ namespace JackboxGPT3.Games.Common.Models
     public struct JackboxRoom
     {
         [JsonProperty("appId")]
-        public Guid AppId { get; set; }
+        public string AppId { get; set; }
 
         [JsonProperty("appTag")]
         public string AppTag { get; set; }
