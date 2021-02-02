@@ -42,10 +42,10 @@ namespace JackboxGPT3.Engines
                 ChooseRandomCategory();
 
             if (JackboxClient.GameState.Room.State == RoomState.EnterText && !_lieLock)
-                SubmitLie();
+                SubmitLie(self);
 
             if (JackboxClient.GameState.Room.State == RoomState.ChooseLie && !_truthLock)
-                SubmitTruth();
+                SubmitTruth(self);
         }
 
         private void OnRoomUpdate(object sender, Revision<Fibbage3Room> revision)
@@ -55,11 +55,11 @@ namespace JackboxGPT3.Engines
         }
         
         #region Game Actions
-        private async void SubmitLie()
+        private async void SubmitLie(Fibbage3Player self)
         {
             _lieLock = true;
 
-            var prompt = CleanPromptForEntry(JackboxClient.GameState.Self.Question);
+            var prompt = CleanPromptForEntry(self.Question);
             LogInfo($"Asking GPT-3 for lie in response to \"{prompt}\".");
 
             var lie = await ProvideLie(prompt);
@@ -68,14 +68,14 @@ namespace JackboxGPT3.Engines
             JackboxClient.SubmitLie(lie);
         }
 
-        private async void SubmitTruth()
+        private async void SubmitTruth(Fibbage3Player self)
         {
             _truthLock = true;
 
             var prompt = CleanPromptForEntry(JackboxClient.GameState.Room.Question);
             LogInfo("Asking GPT-3 to choose truth.");
 
-            var choices = JackboxClient.GameState.Self.LieChoices;
+            var choices = self.LieChoices;
             var truth = await ProvideTruth(prompt, choices);
             LogInfo($"Submitting truth {truth}.");
 
