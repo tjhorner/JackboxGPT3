@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.808.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JackboxGPT3", "src\JackboxGPT3.csproj", "{0E155835-CDCC-4DAA-80F9-CBCDE6A6B64E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\tests.csproj", "{08C74394-8BAF-4DB2-A9ED-82C664D06E43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "tests\Tests.csproj", "{08C74394-8BAF-4DB2-A9ED-82C664D06E43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
