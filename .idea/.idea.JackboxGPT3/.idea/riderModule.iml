@@ -6,6 +6,9 @@
     <content url="file://$USER_HOME$/.nuget/packages/nunit3testadapter/3.16.1/build/netcoreapp2.1/NUnit3.TestAdapter.pdb" />
     <content url="file://$USER_HOME$/.nuget/packages/nunit3testadapter/3.16.1/build/netcoreapp2.1/nunit.engine.api.dll" />
     <content url="file://$USER_HOME$/.nuget/packages/nunit3testadapter/3.16.1/build/netcoreapp2.1/nunit.engine.dll" />
+    <content url="file://$USER_HOME$/.nuget/packages/nunitxml.testlogger/3.0.91/build/_common/Microsoft.VisualStudio.TestPlatform.Extension.NUnit.Xml.TestAdapter.dll" />
+    <content url="file://$USER_HOME$/.nuget/packages/nunitxml.testlogger/3.0.91/build/_common/Microsoft.VisualStudio.TestPlatform.Extension.NUnit.Xml.TestLogger.dll" />
+    <content url="file://$USER_HOME$/.nuget/packages/nunitxml.testlogger/3.0.91/build/_common/Spekt.TestLogger.dll" />
     <content url="file://$MODULE_DIR$/../.." />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

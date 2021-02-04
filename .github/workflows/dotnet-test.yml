@@ -1,0 +1,34 @@
+name: .NET Build and Test
+
+on:
+  push:
+    branches: [ master, test-gh-actions ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.102
+  
+      - name: Install dependencies
+        run: dotnet nuget locals all --clear && dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test --verbosity normal --logger:"nunit;LogFilePath=TestResults/test-result.xml" /p:CollectCoverage=true /p:CoverletOutputFormat=opencover /p:CoverletOutput=coverage.xml
+
+      - uses: MirrorNG/nunit-reporter@v1.0.9
+        if: always()
+        with:
+          path: "tests/**/TestResults/*.xml"
+          access-token: ${{ secrets.GITHUB_TOKEN }}
