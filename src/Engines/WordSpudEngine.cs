@@ -56,26 +56,29 @@ namespace JackboxGPT3.Engines
 
         private async Task<string> ProvideSpud(string currentWord)
         {
-            var prompt = $@"The game Word Spud is played by continuing a word or phrase with a related word or phrase. For example:
+            var prompt = $@"The game Word Spud is played by continuing a word or phrase with a funny related word or phrase. For example:
 
-jelly fish
-deal or no deal
-fish sticks
-mmmmmr. peanut
-{currentWord}";
+- jellyfish
+- deal with it
+- fishsticks
+- beat saber
+- tailor-made
+- real life
+- how do you do
+- {currentWord}";
 
             LogDebug($"GPT-3 Prompt: {prompt}");
 
             var result = await CompletionService.CompletePrompt(prompt, new CompletionParameters
             {
-                Temperature = 0.7,
+                Temperature = 0.8,
                 MaxTokens = 16,
                 TopP = 1,
                 FrequencyPenalty = 0.3,
-                PresencePenalty = 0.2,
+                PresencePenalty = 0.3,
                 StopSequences = new[] { "\n" }
             }, completion => completion.Text.Trim() != "" && completion.Text.Length <= 32,
-                defaultResponse: "oops, it broke");
+                defaultResponse: ".");
 
             return result.Text.TrimEnd();
         }

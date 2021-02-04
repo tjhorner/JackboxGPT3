@@ -18,7 +18,7 @@ namespace JackboxGPT3.Engines
         protected override string Tag => "quiplash3";
 
         private bool _selectedAvatar;
-        private Random _random = new();
+        private readonly Random _random = new();
 
         public Quiplash3Engine(ICompletionService completionService, ILogger logger, Quiplash3Client client)
             : base(completionService, logger, client)
