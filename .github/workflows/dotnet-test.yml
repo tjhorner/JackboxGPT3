@@ -2,7 +2,7 @@ name: .NET Build and Test
 
 on:
   push:
-    branches: [ master, test-gh-actions ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
