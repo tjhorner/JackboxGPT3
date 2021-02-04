@@ -69,5 +69,11 @@ namespace JackboxGPT3.Games.Fibbage3.Models
 
         [JsonProperty("state")]
         public RoomState State { get; set; }
+        
+        [JsonProperty("doubleInput")]
+        public bool DoubleInput { get; set; }
+        
+        [JsonProperty("answerDelim")]
+        public string AnswerDelim { get; set; }
     }
 }

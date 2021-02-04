@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using JackboxGPT3.Extensions;
 using JackboxGPT3.Games.Common.Models;
@@ -42,7 +43,10 @@ namespace JackboxGPT3.Engines
                 ChooseRandomCategory();
 
             if (JackboxClient.GameState.Room.State == RoomState.EnterText && !_lieLock)
-                SubmitLie(self);
+                if (self.DoubleInput)
+                    SubmitDoubleLie(self);
+                else
+                    SubmitLie(self);
 
             if (JackboxClient.GameState.Room.State == RoomState.ChooseLie && !_truthLock)
                 SubmitTruth(self);
@@ -64,6 +68,19 @@ namespace JackboxGPT3.Engines
 
             var lie = await ProvideLie(prompt);
             LogInfo($"Submitting lie \"{lie}\".");
+
+            JackboxClient.SubmitLie(lie);
+        }
+        
+        private async void SubmitDoubleLie(Fibbage3Player self)
+        {
+            _lieLock = true;
+
+            var prompt = CleanPromptForEntry(self.Question);
+            LogInfo($"Asking GPT-3 for double lie in response to \"{prompt}\".");
+
+            var lie = await ProvideDoubleLie(prompt, self.AnswerDelim, self.MaxLength);
+            LogInfo($"Submitting double lie \"{lie}\".");
 
             JackboxClient.SubmitLie(lie);
         }
@@ -125,6 +142,46 @@ A:";
                 defaultResponse: "Default Response!");
 
             return result.Text.Trim();
+        }
+        
+        private async Task<string> ProvideDoubleLie(string fibPrompt, string delim, int maxLength)
+        {
+            var prompt = $@"Here are some prompts from the game Fibbage, in which players attempt to write convincing lies to trick others. These prompts require two responses, separated by the | character.
+
+Q: Researchers at Aalto and Oxfort universities studied the phone records of over 3.2 million Europeans and found that people have the most _______ when they _______.
+A: friends|are 25 years old
+
+Q: The controversial Supreme Court case Nix v. Hedden upset more than a few people when the court ruled that _______ are _______.
+A: tomatoes|vegetables
+
+Q: In an attempt to teach kids an important lesson, Bernie Karl of Alaska wants to put a _______ of _______ in every public school.
+A: box|handguns
+
+Q: {fibPrompt}
+A:";
+
+            var result = await CompletionService.CompletePrompt(prompt, new CompletionParameters
+                {
+                    Temperature = 0.8,
+                    MaxTokens = 16,
+                    TopP = 1,
+                    FrequencyPenalty = 0.2,
+                    StopSequences = new[] { "\n" }
+                }, completion =>
+                {
+                    try
+                    {
+                        var lies = completion.Text.Trim().Split('|');
+                        return lies.Length == 2 && !lies.Any(lie => lie.Length > maxLength);
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                },
+                defaultResponse: "default|response");
+
+            return string.Join(delim, result.Text.Trim().Split('|'));
         }
 
         private async Task<int> ProvideTruth(string fibPrompt, IReadOnlyList<LieChoice> lies)
