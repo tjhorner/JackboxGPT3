@@ -6,6 +6,7 @@ using JackboxGPT3.Engines;
 using JackboxGPT3.Games.Common.Models;
 using JackboxGPT3.Games.Fibbage3;
 using JackboxGPT3.Games.Quiplash3;
+using JackboxGPT3.Games.SurviveTheInternet;
 using JackboxGPT3.Games.WordSpud;
 using JackboxGPT3.Services;
 using Newtonsoft.Json;
@@ -69,6 +70,9 @@ namespace JackboxGPT3
             
             builder.RegisterType<WordSpudClient>();
             builder.RegisterType<WordSpudEngine>().Keyed<IJackboxEngine>("wordspud");
+            
+            builder.RegisterType<SurviveTheInternetClient>();
+            builder.RegisterType<SurviveTheInternetEngine>().Keyed<IJackboxEngine>("survivetheinternet");
         }
     }
 }

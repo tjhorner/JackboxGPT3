@@ -8,5 +8,10 @@ namespace JackboxGPT3.Extensions
         {
             return Regex.Replace(input, "<.*?>", string.Empty);
         }
+
+        public static string TrimQuotes(this string input)
+        {
+            return input.Trim('"').Trim('“').Trim('”');
+        }
     }
 }
