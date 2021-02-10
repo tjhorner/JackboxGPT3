@@ -143,6 +143,7 @@ A:";
 
 An absurd and ridiculous Instagram caption for a photo of a group of mailboxes, with one open: Learned how to lock pick earlier. Score!
 An absurd and ridiculous Instagram caption for a photo of people's legs through bathroom stalls: Just asked these guys how they were doing. They didn't respond.
+An absurd and ridiculous Instagram caption for a photo of a group of people posing for a photo at a funeral: Funeral? I thought this was a party.
 An absurd and ridiculous Instagram caption for a photo of {description}:";
             
             LogDebug($"GPT-3 Prompt: {prompt}");
@@ -165,7 +166,7 @@ An absurd and ridiculous Instagram caption for a photo of {description}:";
         {
             const string pattern = @"[A-z]+\.jpg";
             var match = Regex.Match(stiPrompt.AboveBlackBox, pattern);
-            return match.Success ? match.Value : "Baseball";
+            return match.Success ? match.Value : "Baseball.jpg"; // why not
         }
         #endregion
     }
