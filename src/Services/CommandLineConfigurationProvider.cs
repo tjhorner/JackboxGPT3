@@ -7,6 +7,9 @@ namespace JackboxGPT3.Services
     {
         [Value(0, Required = true, HelpText = "The room code to join.", MetaName = "room-code")]
         public override string RoomCode { get; set; }
+        
+        [Option("name", Default = "GPT-3", HelpText = "The name the player should join the room as.")]
+        public override string PlayerName { get; set; }
 
         [Option("engine", Default = "davinci", HelpText =
             "The GPT-3 model to use for completions. Some game engines may use different prompts. " +

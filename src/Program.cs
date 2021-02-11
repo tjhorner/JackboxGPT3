@@ -1,8 +1,6 @@
-﻿using Autofac;
-using CommandLine;
+﻿using CommandLine;
 using dotenv.net;
 using JackboxGPT3.Services;
-using Serilog;
 
 namespace JackboxGPT3
 {

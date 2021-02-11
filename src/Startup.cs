@@ -12,7 +12,6 @@ using JackboxGPT3.Games.WordSpud;
 using JackboxGPT3.Services;
 using Newtonsoft.Json;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 
 namespace JackboxGPT3

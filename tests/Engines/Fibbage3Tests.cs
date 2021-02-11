@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using Tests.Helpers;
 
 namespace Tests.Engines
