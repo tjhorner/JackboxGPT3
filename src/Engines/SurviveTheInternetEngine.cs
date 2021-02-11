@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using JackboxGPT3.Extensions;
@@ -14,10 +15,12 @@ namespace JackboxGPT3.Engines
         protected override string Tag => "survivetheinternet";
 
         private readonly ImageDescriptionProvider _descriptionProvider;
+        private readonly IConfigurationProvider _configuration;
 
-        public SurviveTheInternetEngine(ICompletionService completionService, ILogger logger,
+        public SurviveTheInternetEngine(ICompletionService completionService, ILogger logger, IConfigurationProvider configuration,
             SurviveTheInternetClient client) : base(completionService, logger, client)
         {
+            _configuration = configuration;
             _descriptionProvider = new ImageDescriptionProvider("sti_image_descriptions.json");
             
             JackboxClient.OnSelfUpdate += OnSelfUpdate;
@@ -137,9 +140,13 @@ A:";
         
         private async Task<string> ProvideImageTwist(TextPrompt stiPrompt, int maxLength)
         {
+            var isInstruct = _configuration.OpenAIEngine.EndsWith("-instruct-beta");
             var description = _descriptionProvider.ProvideDescriptionForImageId(GetImageId(stiPrompt));
-            
-            var prompt = $@"Below are some responses from the party game Survive the Internet. In the final round, each player takes an image and tries to come up with a caption that would make the other players look crazy or ridiculous.
+
+            // TODO rewrite, it is ugly :(
+            var prompt = isInstruct ?
+                $@"Write an absurd, weird, funny, ridiculous Instagram caption for a photo of {description}." :
+                $@"Below are some responses from the party game Survive the Internet. In the final round, each player takes an image and tries to come up with a caption that would make the other players look crazy or ridiculous.
 
 An absurd and ridiculous Instagram caption for a photo of a group of mailboxes, with one open: Learned how to lock pick earlier. Score!
 An absurd and ridiculous Instagram caption for a photo of people's legs through bathroom stalls: Just asked these guys how they were doing. They didn't respond.
@@ -155,7 +162,7 @@ An absurd and ridiculous Instagram caption for a photo of {description}:";
                     TopP = 1,
                     FrequencyPenalty = 0.3,
                     PresencePenalty = 0.2,
-                    StopSequences = new[] { "\n" }
+                    StopSequences = isInstruct ? Array.Empty<string>() : new[] { "\n" }
                 }, completion => completion.Text.Length <= maxLength,
                 defaultResponse: "I dunno");
 

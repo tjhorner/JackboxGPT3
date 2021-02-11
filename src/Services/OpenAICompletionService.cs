@@ -13,11 +13,11 @@ namespace JackboxGPT3.Services
         /// <summary>
         /// Instantiate an <see cref="OpenAICompletionService"/> from the environment.
         /// </summary>
-        public OpenAICompletionService() : this(Environment.GetEnvironmentVariable("OPENAI_KEY")) { }
+        public OpenAICompletionService(IConfigurationProvider configuration) : this(Environment.GetEnvironmentVariable("OPENAI_KEY"), configuration) { }
 
-        public OpenAICompletionService(string apiKey)
+        private OpenAICompletionService(string apiKey, IConfigurationProvider configuration)
         {
-            _api = new OpenAIAPI(apiKey, Engine.Davinci);
+            _api = new OpenAIAPI(apiKey, configuration.OpenAIEngine);
         }
 
         public async Task<CompletionResponse> CompletePrompt(

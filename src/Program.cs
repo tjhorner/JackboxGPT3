@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using CommandLine;
 using dotenv.net;
 using JackboxGPT3.Services;
 using Serilog;
@@ -7,26 +8,11 @@ namespace JackboxGPT3
 {
     public static class Program
     {
-        public static void Main()
+        public static void Main(string[] args)
         {
             DotEnv.AutoConfig();
-
-            var logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .CreateLogger();
-
-            Log.Logger = logger;
-
-            var builder = new ContainerBuilder();
-            builder.RegisterType<CommandLineConfigurationProvider>().As<IConfigurationProvider>();
-            builder.RegisterType<OpenAICompletionService>().As<ICompletionService>();
-            builder.RegisterInstance<ILogger>(logger).SingleInstance();
-
-            builder.RegisterGameEngines();
-
-            var container = builder.Build();
-            Startup.Bootstrap(container).Wait();
+            Parser.Default.ParseArguments<CommandLineConfigurationProvider>(args)
+                .WithParsed((conf) => Startup.Bootstrap(conf).Wait());
         }
     }
 }

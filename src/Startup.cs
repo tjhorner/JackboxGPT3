@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
@@ -11,6 +12,8 @@ using JackboxGPT3.Games.WordSpud;
 using JackboxGPT3.Services;
 using Newtonsoft.Json;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 
 namespace JackboxGPT3
 {
@@ -18,13 +21,25 @@ namespace JackboxGPT3
     {
         private static readonly HttpClient _httpClient = new();
 
-        public static async Task Bootstrap(IContainer container)
+        public static async Task Bootstrap(IConfigurationProvider configuration)
         {
-            var logger = container.Resolve<ILogger>();
+            var logger = new LoggerConfiguration()
+                .MinimumLevel.Is(Enum.Parse<LogEventLevel>(configuration.LogLevel, true))
+                .WriteTo.Console()
+                .CreateLogger();
+
+            Log.Logger = logger;
+
+            var builder = new ContainerBuilder();
+            builder.RegisterInstance(configuration).As<IConfigurationProvider>();
+            builder.RegisterType<OpenAICompletionService>().As<ICompletionService>();
+            builder.RegisterInstance<ILogger>(logger).SingleInstance();
+
+            builder.RegisterGameEngines();
+
+            var container = builder.Build();
 
             logger.Information("Starting up...");
-
-            var configuration = container.Resolve<IConfigurationProvider>();
 
             var roomCode = configuration.RoomCode;
             var ecastHost = configuration.EcastHost;
@@ -59,7 +74,7 @@ namespace JackboxGPT3
             container.ResolveNamed<IJackboxEngine>(tag);
         }
 
-        public static void RegisterGameEngines(this ContainerBuilder builder)
+        private static void RegisterGameEngines(this ContainerBuilder builder)
         {
             // Game engines, keyed with appTag
             builder.RegisterType<Fibbage3Client>();
