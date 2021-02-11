@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -34,12 +35,23 @@ namespace JackboxGPT3.Services
             public string[] StopSequences;
         }
 
+        public struct SearchResponse
+        {
+            public int Index;
+            public double Score;
+        }
+
         public Task<CompletionResponse> CompletePrompt(
             string prompt,
             CompletionParameters completionParameters,
             Func<CompletionResponse, bool> conditions,
             int maxTries = 5,
             string defaultResponse = ""
+        );
+
+        public Task<List<SearchResponse>> SemanticSearch(
+            string query,
+            IList<string> documents
         );
     }
 }

@@ -81,13 +81,13 @@ namespace JackboxGPT3.Engines
             var prompt = $@"In the first part of the game Survive the Internet, players are asked questions which they should answer short and concisely. For example:
 
 Q: How's your retirement fund doing?
-A: It's nonexistant!
+A: It's nonexistant.
 
 Q: What are your thoughts on professional wrestling?
 A: It's all so fake.
 
 Q: Describe an attitude you admire.
-A: I love positive people!
+A: I love positive people.
 
 Q: {stiPrompt}
 A:";
@@ -112,7 +112,6 @@ A:";
         {
             var prompt = $@"Below are some responses from the party game Survive the Internet. The goal of this game is to take another player's words and twist them to make the other player look ridiculous.
 
-""Some things are best kept in the dark"" would be a silly comment to a crowdfunding campaign titled: Help Me Fund My Movie
 ""I'm skeptical"" would be a ridiculous response to this comment: She said yes!
 ""Too much nudity"" would be a ridiculous comment to a video titled: How to Play Guitar
 ""Yawn"" would be a terrible comment in response to this news headline: Bank Robber on the Loose

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace JackboxGPT3.Games.Quiplash3.Models
+namespace JackboxGPT3.Games.Common.Models
 {
     public struct TextUpdateRequest
     {

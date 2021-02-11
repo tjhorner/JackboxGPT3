@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Autofac;
 using JackboxGPT3.Engines;
+using JackboxGPT3.Games.BlatherRound;
 using JackboxGPT3.Games.Common.Models;
 using JackboxGPT3.Games.Fibbage3;
 using JackboxGPT3.Games.Quiplash3;
@@ -87,6 +88,9 @@ namespace JackboxGPT3
             
             builder.RegisterType<SurviveTheInternetClient>();
             builder.RegisterType<SurviveTheInternetEngine>().Keyed<IJackboxEngine>("survivetheinternet");
+            
+            builder.RegisterType<BlatherRoundClient>();
+            builder.RegisterType<BlatherRoundEngine>().Keyed<IJackboxEngine>("blanky-blank");
         }
     }
 }

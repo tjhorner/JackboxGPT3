@@ -8,6 +8,7 @@ This project is a Jackbox client controlled by GPT-3. It currently supports thes
 - Quiplash 3
 - Word Spud _(always votes positively for now)_
 - Survive the Internet _(chooses images/votes randomly for now)_
+- Blather 'Round
 
 ## Playing
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using OpenAI_API;
 using static JackboxGPT3.Services.ICompletionService;
@@ -70,6 +72,12 @@ namespace JackboxGPT3.Services
                 Text = choice.Text,
                 FinishReason = choice.FinishReason
             };
+        }
+        
+        public async Task<List<ICompletionService.SearchResponse>> SemanticSearch(string query, IList<string> documents)
+        {
+            var apiResults = await _api.Search.GetSearchResultsAsync(query, documents.ToArray());
+            return apiResults.Select(apiResult => new ICompletionService.SearchResponse {Index = documents.IndexOf(apiResult.Key), Score = apiResult.Value}).ToList();
         }
     }
 }
