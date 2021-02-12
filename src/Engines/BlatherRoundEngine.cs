@@ -18,6 +18,7 @@ namespace JackboxGPT3.Engines
 
         private readonly Random _random = new();
         private readonly List<string> _guessesUsedThisRound = new();
+        private bool _writing = false;
         
         public BlatherRoundEngine(ICompletionService completionService, ILogger logger, BlatherRoundClient client) : base(completionService, logger, client)
         {
@@ -58,8 +59,37 @@ namespace JackboxGPT3.Engines
 
         private async void OnWriteNewSentence(object sender, Sentence sentence)
         {
-            await Task.Delay(5000);
-            if (JackboxClient.CurrentSentence == null || JackboxClient.GameState.Self.Prompt.Html == null) return;
+            if (_writing) return;
+            await Task.Delay(10000);
+
+            _writing = true;
+            
+            while (true)
+            {
+                var sentenceResult = await WriteSentence();
+
+                if (sentenceResult == SentenceResult.Skip)
+                {
+                    JackboxClient.SubmitSentence(true);
+                    await Task.Delay(1000);
+                }
+                else if (sentenceResult == SentenceResult.Submit)
+                {
+                    JackboxClient.SubmitSentence();
+                    break;
+                }
+                else if (sentenceResult == SentenceResult.DoNothing)
+                {
+                    break;
+                }
+            }
+
+            _writing = false;
+        }
+
+        private async Task<SentenceResult> WriteSentence()
+        {
+            if (JackboxClient.CurrentSentence == null || JackboxClient.GameState.Self.Prompt.Html == null) return SentenceResult.DoNothing;
 
             var parts = JackboxClient.CurrentSentence.Parts;
             var prompt = GetCleanPrompt();
@@ -69,19 +99,19 @@ namespace JackboxGPT3.Engines
             if (JackboxClient.CurrentSentence.Type != SentenceType.Response)
             {
                 // Randomly decide which order to select the parts in
-                if (_random.Next(0, 1) == 0)
+                if (_random.Next(0, 2) == 0)
                 {
                     LogVerbose("Processing parts from last to first.");
                     for (var index = parts.Count - 1; index >= 0; index--)
                         if (!await ProcessPart(prompt, parts, index, PartOrder.Before))
-                            return;
+                            return SentenceResult.Skip;
                 }
                 else
                 {
                     LogVerbose("Processing parts from first to last.");
                     for (var index = 0; index < parts.Count; index++)
                         if (!await ProcessPart(prompt, parts, index))
-                            return;
+                            return SentenceResult.Skip;
                 }
             }
             else
@@ -89,11 +119,8 @@ namespace JackboxGPT3.Engines
                 var unusedChoices = parts[1].Choices.Where(choice => !_guessesUsedThisRound.Contains(choice)).ToList();
 
                 if (unusedChoices.Count == 0)
-                {
-                    JackboxClient.SubmitSentence(true);
-                    return;
-                }
-                
+                    return SentenceResult.Skip;
+
                 var results = await CompletionService.SemanticSearch(prompt, unusedChoices);
                 results.Sort((a, b) => (int)(b.Score - a.Score));
                 
@@ -101,7 +128,7 @@ namespace JackboxGPT3.Engines
                     LogVerbose($"{unusedChoices[result.Index]}: {result.Score}");
                 
                 // Randomly decide whether to check best or worst performers
-                if (_random.Next(0, 1) == 0 && results[0].Score >= 50)
+                if (_random.Next(0, 2) == 0 && results[0].Score >= 50)
                 {
                     var qualifierIndex = -1;
                     foreach (var qualifier in Sentence.PHRASES_SIMILAR_TO)
@@ -134,15 +161,12 @@ namespace JackboxGPT3.Engines
                     JackboxClient.ChooseWord(1, parts[1].Choices.IndexOf(unusedChoices[results.Last().Index]));
                 }
                 else
-                {
-                    JackboxClient.SubmitSentence(true);
-                    return;
-                }
+                    return SentenceResult.Skip;
 
                 await Task.Delay(100);
             }
 
-            JackboxClient.SubmitSentence();
+            return SentenceResult.Submit;
         }
 
         private async Task<bool> ProcessPart(string prompt, IList<SentencePart> parts, int index, PartOrder order = PartOrder.After)
@@ -173,7 +197,6 @@ namespace JackboxGPT3.Engines
             if (JackboxClient.CurrentSentence.Type != SentenceType.Writing && chosenWords == "" && results[0].Score < 10)
             {
                 // not confident enough; skip
-                JackboxClient.SubmitSentence(true);
                 return false;
             }
 
@@ -187,17 +210,7 @@ namespace JackboxGPT3.Engines
 
         private async Task<string> ProvideGuess()
         {
-            var prompt =
-                $@"I was given a list of sentences to describe a place:
-
-It's a fantastic food place.
-It's where you have the guilty pleasure.
-So much din-din!
-It's where you delight in the wrap.
-It's a spicy food.
-
-My guess: Taco Bell
-###
+            /*
 I was given a list of sentences to describe a thing:
 
 It's a neat-o rectangle object.
@@ -212,11 +225,24 @@ Oh, childhood!
 
 My guess: Etch-a-Sketch
 ###
-I was given a list of sentences to describe a {JackboxClient.CurrentCategory}:
+             */
+            
+            var prompt =
+                $@"A list of sentences to describe a place:
+
+It's a fantastic food place.
+It's where you have the guilty pleasure.
+So much din-din!
+It's where you delight in the wrap.
+It's a spicy food.
+
+Guess: Taco Bell.
+###
+A list of sentences to describe a {JackboxClient.CurrentCategory}:
 
 {string.Join('\n', JackboxClient.CurrentSentences)}
 
-My guess:";
+Guess:";
             
             LogVerbose($"GPT-3 Prompt: {prompt}");
             
@@ -227,8 +253,8 @@ My guess:";
                     TopP = 1,
                     FrequencyPenalty = 0.3,
                     PresencePenalty = 0.2,
-                    StopSequences = new[] { "\n", "###" }
-                }, completion => CleanAnswer(completion.Text).Length <= 40 && !_guessesUsedThisRound.Contains(CleanAnswer(completion.Text)),
+                    StopSequences = new[] { "\n", "###", "." }
+                }, completion => CleanAnswer(completion.Text) != "" && CleanAnswer(completion.Text).Length <= 40 && !_guessesUsedThisRound.Contains(CleanAnswer(completion.Text)),
                 defaultResponse: "");
 
             return CleanAnswer(result.Text);
@@ -244,8 +270,15 @@ My guess:";
             answer = answer.Trim();
             var articlesRegex = new Regex("^(a|an|the) ", RegexOptions.IgnoreCase);
             answer = articlesRegex.Replace(answer, "").Trim();
-            return answer.TrimEnd('.');
+            return answer.TrimEnd('.').TrimQuotes();
         }
+    }
+
+    internal enum SentenceResult
+    {
+        Skip,
+        Submit,
+        DoNothing
     }
 
     internal enum PartOrder

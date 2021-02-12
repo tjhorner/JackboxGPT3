@@ -38,6 +38,7 @@ namespace JackboxGPT3.Games.BlatherRound.Models
         Lobby,
         MakeSingleChoice,
         Logo,
+        Gameplay_Logo,
         MakeSentence,
         EnterSingleText
     }
