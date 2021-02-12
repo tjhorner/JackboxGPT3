@@ -48,6 +48,15 @@ namespace JackboxGPT3.Services
             int maxTries = 5,
             string defaultResponse = ""
         );
+        
+        public Task<T> CompletePrompt<T>(
+            string prompt,
+            CompletionParameters completionParameters,
+            Func<CompletionResponse, T> process,
+            T defaultResponse,
+            Func<T, bool> conditions = null,
+            int maxTries = 5
+        );
 
         public Task<List<SearchResponse>> SemanticSearch(
             string query,

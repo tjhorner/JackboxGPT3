@@ -64,6 +64,44 @@ namespace JackboxGPT3.Services
 
             return result;
         }
+        
+        public async Task<T> CompletePrompt<T>(
+            string prompt,
+            CompletionParameters completionParameters,
+            Func<CompletionResponse, T> process,
+            T defaultResponse,
+            Func<T, bool> conditions = null,
+            int maxTries = 5
+        ) {
+            var processedResult = defaultResponse;
+            var validResponse = false;
+            var tries = 0;
+
+            while(!validResponse && tries < maxTries)
+            {
+                tries++;
+                var apiResult = await _api.Completions.CreateCompletionAsync(
+                    prompt,
+                    completionParameters.MaxTokens,
+                    completionParameters.Temperature,
+                    completionParameters.TopP,
+                    1,
+                    logProbs: completionParameters.LogProbs,
+                    echo: completionParameters.Echo,
+                    presencePenalty: completionParameters.PresencePenalty,
+                    frequencyPenalty: completionParameters.FrequencyPenalty,
+                    stopSequences: completionParameters.StopSequences
+                );
+
+                var result = ChoiceToCompletionResponse(apiResult.Completions[0]);
+                processedResult = process(result);
+
+                if (conditions == null) break;
+                validResponse = conditions(processedResult);
+            }
+
+            return processedResult;
+        }
 
         private static CompletionResponse ChoiceToCompletionResponse(Choice choice)
         {

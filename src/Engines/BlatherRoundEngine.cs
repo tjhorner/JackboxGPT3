@@ -18,14 +18,21 @@ namespace JackboxGPT3.Engines
 
         private readonly Random _random = new();
         private readonly List<string> _guessesUsedThisRound = new();
-        private bool _writing = false;
+        private bool _writing;
         
         public BlatherRoundEngine(ICompletionService completionService, ILogger logger, BlatherRoundClient client) : base(completionService, logger, client)
         {
             JackboxClient.OnSelfUpdate += OnSelfUpdate;
             JackboxClient.OnWriteNewSentence += OnWriteNewSentence;
             JackboxClient.OnPlayerStartedPresenting += OnPlayerStartedPresenting;
+            JackboxClient.OnNewSentence += OnNewSentence;
             JackboxClient.Connect();
+        }
+
+        private void OnNewSentence(object sender, string sentence)
+        {
+            if (JackboxClient.GameState.Self.State != PlayerState.EnterSingleText) return;
+            SubmitGuess();
         }
 
         private void OnPlayerStartedPresenting(object sender, EventArgs e)
@@ -37,18 +44,21 @@ namespace JackboxGPT3.Engines
         {
             if(revision.Old.State != revision.New.State && revision.New.State == PlayerState.MakeSingleChoice)
                 ChoosePassword(revision.New);
-            else if (revision.New.State == PlayerState.EnterSingleText && revision.Old.EntryId != revision.New.EntryId)
-                SubmitGuess();
+            //else if (revision.New.State == PlayerState.EnterSingleText && revision.Old.EntryId != revision.New.EntryId)
+            //    SubmitGuess();
         }
 
         private async void SubmitGuess()
         {
-            await Task.Delay(5000);
-            
-            var guess = await ProvideGuess();
-            _guessesUsedThisRound.Add(guess);
-            
-            JackboxClient.SubmitGuess(guess);
+            var guesses = await ProvideGuesses();
+            _guessesUsedThisRound.AddRange(guesses);
+
+            foreach (var guess in guesses)
+            {
+                if (JackboxClient.GameState.Self.State != PlayerState.EnterSingleText) return;
+                JackboxClient.SubmitGuess(guess);
+                await Task.Delay(1000);
+            }
         }
 
         private void ChoosePassword(BlatherRoundPlayer self)
@@ -192,7 +202,7 @@ namespace JackboxGPT3.Engines
         
             // Top performers are the results within 20 points of the top performing result.
             // Will be chosen randomly.
-            var topPerformers = results.Where(r => results[0].Score - r.Score <= 20).ToList();
+            var topPerformers = results.Where(r => results[0].Score - r.Score <= 10).ToList();
             
             if (JackboxClient.CurrentSentence.Type != SentenceType.Writing && chosenWords == "" && results[0].Score < 10)
             {
@@ -208,7 +218,7 @@ namespace JackboxGPT3.Engines
             return true;
         }
 
-        private async Task<string> ProvideGuess()
+        private async Task<IList<string>> ProvideGuesses()
         {
             /*
 I was given a list of sentences to describe a thing:
@@ -236,28 +246,33 @@ So much din-din!
 It's where you delight in the wrap.
 It's a spicy food.
 
-Guess: Taco Bell.
+Guesses: Taco Bell; Wendy's; restaurant; McDonald's; Subway
 ###
 A list of sentences to describe a {JackboxClient.CurrentCategory}:
 
 {string.Join('\n', JackboxClient.CurrentSentences)}
 
-Guess:";
+Guesses:";
             
             LogVerbose($"GPT-3 Prompt: {prompt}");
             
-            var result = await CompletionService.CompletePrompt(prompt, new ICompletionService.CompletionParameters
+            var result = await CompletionService.CompletePrompt(
+                prompt,
+                new ICompletionService.CompletionParameters
                 {
                     Temperature = 0.8,
-                    MaxTokens = 16,
+                    MaxTokens = 64,
                     TopP = 1,
                     FrequencyPenalty = 0.3,
                     PresencePenalty = 0.2,
-                    StopSequences = new[] { "\n", "###", "." }
-                }, completion => CleanAnswer(completion.Text) != "" && CleanAnswer(completion.Text).Length <= 40 && !_guessesUsedThisRound.Contains(CleanAnswer(completion.Text)),
-                defaultResponse: "");
+                    StopSequences = new[] { "\n", "###" }
+                },
+                completion => completion.Text.Trim().Split(";").Select(CleanAnswer).Where(answer =>
+                    answer != "" && answer.Length <= 40 && !_guessesUsedThisRound.Contains(answer)).ToList(),
+                new List<string>()
+            );
 
-            return CleanAnswer(result.Text);
+            return result;
         }
 
         private string GetCleanPrompt()
