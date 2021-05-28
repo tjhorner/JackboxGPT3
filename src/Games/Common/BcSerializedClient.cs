@@ -17,44 +17,7 @@ namespace JackboxGPT3.Games.Common
     {
         protected BcSerializedClient(IConfigurationProvider configuration, ILogger logger) : base(configuration, logger)  {  }
         
-        private const string KEY_ROOM = "bc:room";
-        private const string KEY_PLAYER_PREFIX = "bc:customer:";
-        
-        private const string OP_TEXT = "text";
-        
-        public event EventHandler<Revision<TRoom>> OnRoomUpdate;
-        public event EventHandler<Revision<TPlayer>> OnSelfUpdate;
-        
-        protected override void ServerMessageReceived(ServerMessage<JRaw> msg)
-        {
-            switch(msg.OpCode)
-            {
-                case OP_TEXT:
-                    var op = JsonConvert.DeserializeObject<TextOperation>(msg.Result.ToString());
-                    HandleTextOperation(op);
-                    break;
-            }
-        }
-        
-        private void HandleTextOperation(TextOperation op)
-        {
-            // special case: player ID
-            if (op.Key == $"{KEY_PLAYER_PREFIX}{PlayerId}")
-            {
-                var self = JsonConvert.DeserializeObject<TPlayer>(op.Value);
-                OnSelfUpdate?.Invoke(this, new Revision<TPlayer>(_gameState.Self, self));
-                _gameState.Self = self;
-                return;
-            }
-
-            switch (op.Key)
-            {
-                case KEY_ROOM:
-                    var room = JsonConvert.DeserializeObject<TRoom>(op.Value);
-                    OnRoomUpdate?.Invoke(this, new Revision<TRoom>(_gameState.Room, room));
-                    _gameState.Room = room;
-                    break;
-            }
-        }
+        protected override string KEY_ROOM => "bc:room";
+        protected override string KEY_PLAYER_PREFIX => "bc:customer:";
     }
 }

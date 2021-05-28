@@ -17,15 +17,16 @@ namespace JackboxGPT3.Games.Common
     {
         private const string OP_CLIENT_WELCOME = "client/welcome";
         private const string OP_CLIENT_SEND = "client/send";
+        
+        private const string OP_OBJECT = "object";
+        private const string OP_TEXT = "text";
+        
+        protected abstract string KEY_ROOM { get; }
+        protected abstract string KEY_PLAYER_PREFIX { get; }
 
         public event EventHandler<ClientWelcome> PlayerStateChanged;
-
-        /// <summary>
-        /// Handle a raw <see cref="ServerMessage{Body}"/> event from ecast.
-        /// You'll need to deserialize the <see cref="ServerMessage{Body}.Result"/> yourself
-        /// depending on the opcode.
-        /// </summary>
-        protected abstract void ServerMessageReceived(ServerMessage<JRaw> message);
+        public event EventHandler<Revision<TRoom>> OnRoomUpdate;
+        public event EventHandler<Revision<TPlayer>> OnSelfUpdate;
 
         private readonly IConfigurationProvider _configuration;
         private readonly ILogger _logger;
@@ -79,6 +80,42 @@ namespace JackboxGPT3.Games.Common
 
             _webSocket.Start();
             _exitEvent.WaitOne();
+        }
+        
+        /// <summary>
+        /// Handle a raw <see cref="ServerMessage{Body}"/> event from ecast.
+        /// You'll need to deserialize the <see cref="ServerMessage{Body}.Result"/> yourself
+        /// depending on the opcode.
+        /// </summary>
+        private void ServerMessageReceived(ServerMessage<JRaw> message)
+        {
+            switch(message.OpCode)
+            {
+                case OP_TEXT:
+                    var textOp = JsonConvert.DeserializeObject<TextOperation>(message.Result.ToString());
+                    HandleOperation(textOp);
+                    break;
+                case OP_OBJECT:
+                    var objOp = JsonConvert.DeserializeObject<ObjectOperation>(message.Result.ToString());
+                    HandleOperation(objOp);
+                    break;
+            }
+        }
+        
+        protected virtual void HandleOperation(IOperation op)
+        {
+            if (op.Key == $"{KEY_PLAYER_PREFIX}{PlayerId}" || op.Key == $"{KEY_PLAYER_PREFIX}{_gameState.PlayerId}")
+            {
+                var self = JsonConvert.DeserializeObject<TPlayer>(op.Value);
+                OnSelfUpdate?.Invoke(this, new Revision<TPlayer>(_gameState.Self, self));
+                _gameState.Self = self;
+            }
+            else if (op.Key == KEY_ROOM)
+            {
+                var room = JsonConvert.DeserializeObject<TRoom>(op.Value);
+                OnRoomUpdate?.Invoke(this, new Revision<TRoom>(_gameState.Room, room));
+                _gameState.Room = room;
+            }
         }
 
         private void WsReceived(ResponseMessage msg)

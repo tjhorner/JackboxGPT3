@@ -2,7 +2,7 @@
 
 namespace JackboxGPT3.Games.Common.Models
 {
-    public struct TextOperation
+    public struct TextOperation : IOperation
     {
         [JsonProperty("from")]
         public int From { get; set; }

@@ -87,9 +87,9 @@ namespace JackboxGPT3.Games.BlatherRound
             OnWriteNewSentence?.Invoke(this, CurrentSentence);
         }
 
-        protected override void HandleObjectOperation(ObjectOperation op)
+        protected override void HandleOperation(IOperation op)
         {
-            base.HandleObjectOperation(op);
+            base.HandleOperation(op);
 
             // praise Jackbox for including screen reader support 😌
             if (op.Key != KEY_TEXT_DESCRIPTIONS) return;
