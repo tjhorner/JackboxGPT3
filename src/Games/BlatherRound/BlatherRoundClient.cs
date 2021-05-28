@@ -94,7 +94,7 @@ namespace JackboxGPT3.Games.BlatherRound
             // praise Jackbox for including screen reader support 😌
             if (op.Key != KEY_TEXT_DESCRIPTIONS) return;
             
-            var descriptions = JsonConvert.DeserializeObject<TextDescriptions>(op.Value.ToString());
+            var descriptions = JsonConvert.DeserializeObject<TextDescriptions>(op.Value);
 
             foreach (var description in descriptions.LatestDescriptions)
             {
