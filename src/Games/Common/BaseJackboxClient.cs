@@ -31,7 +31,7 @@ namespace JackboxGPT3.Games.Common
         private readonly IConfigurationProvider _configuration;
         private readonly ILogger _logger;
 
-        protected Guid PlayerId = Guid.NewGuid();
+        private Guid _playerId = Guid.NewGuid();
         // ReSharper disable once InconsistentNaming
         protected GameState<TRoom, TPlayer> _gameState;
 
@@ -53,7 +53,7 @@ namespace JackboxGPT3.Games.Common
             {
                 Role = "player",
                 Name = _configuration.PlayerName,
-                UserId = PlayerId.ToString(),
+                UserId = _playerId.ToString(),
                 Format = "json",
                 Password = ""
             };
@@ -82,11 +82,6 @@ namespace JackboxGPT3.Games.Common
             _exitEvent.WaitOne();
         }
         
-        /// <summary>
-        /// Handle a raw <see cref="ServerMessage{Body}"/> event from ecast.
-        /// You'll need to deserialize the <see cref="ServerMessage{Body}.Result"/> yourself
-        /// depending on the opcode.
-        /// </summary>
         private void ServerMessageReceived(ServerMessage<JRaw> message)
         {
             switch(message.OpCode)
@@ -104,7 +99,7 @@ namespace JackboxGPT3.Games.Common
         
         protected virtual void HandleOperation(IOperation op)
         {
-            if (op.Key == $"{KEY_PLAYER_PREFIX}{PlayerId}" || op.Key == $"{KEY_PLAYER_PREFIX}{_gameState.PlayerId}")
+            if (op.Key == $"{KEY_PLAYER_PREFIX}{_playerId}" || op.Key == $"{KEY_PLAYER_PREFIX}{_gameState.PlayerId}")
             {
                 var self = JsonConvert.DeserializeObject<TPlayer>(op.Value);
                 OnSelfUpdate?.Invoke(this, new Revision<TPlayer>(_gameState.Self, self));
