@@ -210,7 +210,8 @@ Funny Answer:";
                 }
             }, defaultResponse: _random.Next(0, quips.Count).ToString());
 
-            return int.Parse(result.Text.Trim()) - 1;
+            var choice = int.Parse(result.Text.Trim()) - 1;
+            return choice > 0 ? choice : 0;
         }
 
         #region Prompt Cleanup
